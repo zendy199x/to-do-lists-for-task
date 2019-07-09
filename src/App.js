@@ -17,35 +17,11 @@ class App extends Component {
 
     componentWillMount() {
         if(localStorage && localStorage.getItem('tasks')) {
-            var tasks = [JSON.parse(localStorage.getItem('tasks'))];
+            var tasks = JSON.parse(localStorage.getItem('tasks'));
             this.setState({
                 tasks : tasks
             });
         }
-    }
-
-    onGenerateData = () => {
-        var tasks  = [
-            {
-                id: this.generateID(),
-                name: 'Học lập trình',
-                status: true
-            },
-            {
-                id: this.generateID(),
-                name: 'Học bơi',
-                status: false
-            },
-            {
-                id: this.generateID(),
-                name: 'Học tán gái',
-                status: true
-            }
-        ];
-        this.setState({
-            tasks : tasks
-        });
-        localStorage.setItem('tasks', JSON.stringify('tasks'));
     }
 
     s4() {
@@ -100,13 +76,6 @@ class App extends Component {
                             <span className="fa fa-plus mr-5" />
                             Thêm Công Việc
                         </button>
-                        <button
-                            type="button"
-                            className="btn btn-danger ml-5"
-                            onClick={ this.onGenerateData }>
-                            Generate Data 
-                        </button>
-
                         {/*Search-Sort*/}
                         <Control />
                         {/*List*/}
