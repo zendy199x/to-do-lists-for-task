@@ -3,13 +3,14 @@ import TaskItem from './TaskItem';
 
 class TaskList extends Component {
     render() {
-        const {tasks} = this.props;
-        const elmTasks = tasks.map((task, index) => {
+        var {tasks} = this.props;
+        var elmTasks = tasks.map((task, index) => {
             return (
                 <TaskItem
                     key={task.id}
                     task={task}
                     index={index}
+                    onUpdateStatus={ this.props.onUpdateStatus }
                 />
             )
         });
