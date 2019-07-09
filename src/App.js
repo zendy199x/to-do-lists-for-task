@@ -17,7 +17,7 @@ class App extends Component {
 
     componentWillMount() {
         if(localStorage && localStorage.getItem('tasks')) {
-            const tasks = [JSON.parse(localStorage.getItem('tasks'))];
+            var tasks = [JSON.parse(localStorage.getItem('tasks'))];
             this.setState({
                 tasks : tasks
             });
@@ -25,7 +25,7 @@ class App extends Component {
     }
 
     onGenerateData = () => {
-        const tasks  = [
+        var tasks  = [
             {
                 id: this.generateID(),
                 name: 'Học lập trình',
@@ -56,21 +56,37 @@ class App extends Component {
         return this.s4() + '-' + this.s4() + '-' + this.s4() + '-' + this.s4() + '-' + this.s4() + '-' + this.s4() + '-' + this.s4() + '-' + this.s4();
     }
 
+    onToggleForm = () => {
+        this.setState({
+            isDisplayForm : !this.state.isDisplayForm
+        })
+    }
+
+    onCloseForm = () => {
+        this.setState({
+            isDisplayForm: false
+        })
+    }
+
     render() {
-        // eslint-disable-next-line no-unused-vars
-        const { tasks, isDisplayForm } = this.state; //const tasks = this.state.tasks
+        var { tasks, isDisplayForm } = this.state; //const tasks = this.state.tasks
+        var elmTaskForm = isDisplayForm ? <TaskForm onCloseForm={ this.onCloseForm }/> : '';
         return (
             <div className="container">
                 <div className="text-center">
                     <h1>Quản Lý Công Việc</h1><hr/>
                 </div>
                 <div className="row">
-                    <div className="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                    <div className={ isDisplayForm ? 'col-xs-4 col-sm-4 col-md-4 col-lg-4' : ''}>
                         {/*Form*/}
-                        <TaskForm />
+                        {elmTaskForm}
                     </div>
-                    <div className="col-xs-8 col-sm-8 col-md-8 col-lg-8">
-                        <button type="button" className="btn btn-primary">
+                    <div className={ isDisplayForm ? 'col-xs-8 col-sm-8 col-md-8 col-lg-8' : 'col-xs-12 col-sm-12 col-md-12 col-lg-12'}>
+                        <button
+                            type="button"
+                            className="btn btn-primary"
+                            onClick={ this.onToggleForm }
+                            >
                             <span className="fa fa-plus mr-5" />
                             Thêm Công Việc
                         </button>
