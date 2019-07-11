@@ -12,11 +12,27 @@ class TaskForm extends Component {
         }
 
     componentWillMount() {
-        if(this.props.taskEditing) {
+        if(this.props.task) {
             this.setState({
                 id : this.props.task.id,
                 name : this.props.task.name,
                 status : this.props.task.status
+            })
+        }
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if(nextProps && nextProps.task) {
+            this.setState({
+                id : nextProps.task.id,
+                name : nextProps.task.name,
+                status : nextProps.task.status
+            });
+        } else if(!nextProps.task) {
+            this.setState({
+                id : '',
+                name : '',
+                status : false 
             })
         }
     }
