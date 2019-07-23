@@ -1,105 +1,94 @@
 import React, { Component } from 'react';
 
 class TaskForm extends Component {
-    
+
     constructor(props) {
         super(props);
-            this.state = {
-                id : '',
-                name : '',
-                status : false    
-            }
-        }
+        this.state = {};
+    }
 
     componentWillMount() {
-        if(this.props.task) {
+        if(this.props.itemEditing && this.props.itemEditing.id !== null){
             this.setState({
-                id : this.props.task.id,
-                name : this.props.task.name,
-                status : this.props.task.status
-            })
+                id : this.props.itemEditing.id,
+                name : this.props.itemEditing.name,
+                status : this.props.itemEditing.status
+            });
+        }else{
+            this.resetState();
         }
     }
 
     componentWillReceiveProps(nextProps) {
-        if(nextProps && nextProps.task) {
+        if(nextProps && nextProps.itemEditing){
             this.setState({
-                id : nextProps.task.id,
-                name : nextProps.task.name,
-                status : nextProps.task.status
+                id : nextProps.itemEditing.id,
+                name : nextProps.itemEditing.name,
+                status : nextProps.itemEditing.status
             });
-        } else if(!nextProps.task) {
-            this.setState({
-                id : '',
-                name : '',
-                status : false 
-            })
+        }else{
+            this.resetState();
         }
     }
 
-    onCloseForm = () => {
-        this.props.onCloseForm();
-    }
-
-    onChange =(event) => {
+    onHandleChange = (event) => {
         var target = event.target;
         var name = target.name;
-        var value = target.value;
-        if(name === 'status') {
-            value = target.value === 'true' ? true : false;
-        }
+        var value = target.type === 'checkbox' ? target.checked : target.value;
         this.setState({
             [name] : value
         });
     }
 
-    onSubmit = (event) => {
+    onHandleSubmit = (event) => {
         event.preventDefault();
-        this.props.onSubmit(this.state);
-        //Cancel and Close Form
-        this.onClear();
-        this.onCloseForm();
+        this.props.onSave(this.state);
+        this.resetState();
+        this.onExitForm();
     }
 
-    onClear =() => {
+    resetState = () => {
         this.setState({
+            id : '',
             name : '',
-            status: false
-        })
+            status : false
+        });
+    }
+
+    onExitForm = () => {
+        this.props.onExitForm();
     }
 
     render() {
-        var { id } = this.state;
         return (
             <div className="panel panel-warning">
                 <div className="panel-heading">
                     <h3 className="panel-title">
-                        { id !== '' ? 'Cập nhật công việc' : 'Thêm công việc' } 
+                        { !this.state.id ? 'Thêm Công Việc' : 'Cập Nhật Công Việc' }
                         <span
                             className="fa fa-times-circle text-right"
-                            onClick={ this.onCloseForm }
-                        >
-                        </span>
+                            onClick={this.onExitForm}
+                        ></span>
                     </h3>
                 </div>
                 <div className="panel-body">
-                    <form onSubmit={ this.onSubmit }>
+                    <form onSubmit={this.onHandleSubmit} >
                         <div className="form-group">
                             <label>Tên :</label>
                             <input
                                 type="text"
                                 className="form-control"
                                 name="name"
-                                value={ this.state.name }
-                                onChange={ this.onChange }
+                                value={this.state.name}
+                                onChange={ this.onHandleChange }
                             />
                         </div>
                         <label>Trạng Thái :</label>
                         <select
                             className="form-control"
+                            value={this.state.status}
+                            onChange={this.onHandleChange}
                             name="status"
-                            value={ this.state.status }
-                            onChange={ this.onChange }
                         >
                             <option value={true}>Kích Hoạt</option>
                             <option value={false}>Ẩn</option>
@@ -108,11 +97,7 @@ class TaskForm extends Component {
                             <button type="submit" className="btn btn-warning">
                                 <span className="fa fa-plus mr-5"></span>Lưu Lại
                             </button>&nbsp;
-                            <button
-                                type="button"
-                                className="btn btn-danger"
-                                onClick={ this.onClear }
-                            >
+                            <button type="button" onClick={ this.resetState } className="btn btn-danger">
                                 <span className="fa fa-close mr-5"></span>Hủy Bỏ
                             </button>
                         </div>
