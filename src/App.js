@@ -3,12 +3,14 @@ import './App.css';
 import TaskList from './components/TaskList';
 import TaskForm from './components/TaskForm';
 import TaskControl from './components/TaskControl';
+import { connect } from 'react-redux';
+import * as actions from './actions/index';
+
 class App extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            isDisplayForm : false,
             keyword : '',
             filterName : '',
             filterStatus : '-1',
@@ -39,40 +41,8 @@ class App extends Component {
         localStorage.setItem('tasks', JSON.stringify(tasks));
     }
 
-    onSave = (data) => {
-        var tasks = this.state.tasks;
-        data.status = data.status === 'true' ? true : false;
-        if(data.id === ''){
-            data.id = this.guid();
-            tasks.push(data);
-        }else{
-            var index = this.findIndex(data.id);
-            tasks[index]= data;
-        }
-        this.setState({
-            tasks : tasks
-        });
-        localStorage.setItem('tasks', JSON.stringify(tasks));
-    }
-
     onToggleForm = () => {
-        if(this.state.itemEditing !== null){
-            console.log('th1')
-            this.setState({
-                itemEditing : null
-            });
-        }else{
-            this.setState({
-                isShowingForm : !this.state.isShowingForm
-            });
-        }
-    }
-
-    onExitForm = () =>{
-        this.setState({
-            isShowingForm : false,
-            itemEditing : null
-        });
+        this.props.onToggleForm();
     }
 
     onDeleteTask = (id) => {
@@ -114,29 +84,12 @@ class App extends Component {
     }
 
     render() {
-        var { isDisplayForm, sortBy, sortValue, filterName, filterStatus, itemEditing } = this.state;
-        // tasks = filter(tasks, (task) => {
-        //     return includes(task.name.toLowerCase(), keyword.toLowerCase());
-        // });
-        // if(filterName){
-        //     tasks = filter(tasks, (task) => {
-        //         return includes(task.name.toLowerCase(), filterName.toLowerCase());
-        //     });
-        // }
-        // if(filterStatus){
-        //     tasks = filter(tasks, (task) => {
-        //         if(filterStatus === '-1' || filterStatus === -1){
-        //             return task;
-        //         }else{
-        //             return task.status === (parseInt(filterStatus, 10) === 1 ? true : false);
-        //         }
-        //     });
-        // }
-        // tasks = orderBy(tasks, [sortBy], [sortValue]);
+        var { sortBy, sortValue, filterName, filterStatus, itemEditing } = this.state;
+
+        var { isDisplayForm } = this.props;
+
         var elmForm = isDisplayForm === true ? 
         <TaskForm
-            onSave={this.onSave}
-            onExitForm={this.onExitForm}
             itemEditing={ itemEditing }
             /> : '';
         return (
@@ -173,4 +126,18 @@ class App extends Component {
     }
 }
 
-export default App;
+const mapStateToProps = state => {
+    return {
+        isDisplayForm :  state.isDisplayForm
+    };
+}
+
+const mapDispatchToProps = (dispatch, props) => {
+    return {
+        onToggleForm : () => {
+            dispatch(actions.toggleForm())
+        }
+    };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);

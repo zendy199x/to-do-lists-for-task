@@ -29,7 +29,7 @@ class TaskForm extends Component {
                 status : nextProps.itemEditing.status
             });
         }else{
-            this.resetState();
+            this.onClear();
         }
     }
 
@@ -49,7 +49,7 @@ class TaskForm extends Component {
         this.onExitForm();
     }
 
-    resetState = () => {
+    onClear = () => {
         this.setState({
             id : '',
             name : '',
@@ -58,7 +58,7 @@ class TaskForm extends Component {
     }
 
     onExitForm = () => {
-        this.props.onExitForm();
+        this.props.onCloseForm();
     }
 
     render() {
@@ -120,6 +120,9 @@ const mapDispatchToProps = (dispatch, props) => {
     return {
         onAddTask : (task) => {
             dispatch(actions.addTask(task));
+        },
+        onCloseForm : () => {
+            dispatch(actions.closeForm());
         }
     }
 }
