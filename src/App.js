@@ -3,43 +3,35 @@ import './App.css';
 import TaskList from './components/TaskList';
 import TaskForm from './components/TaskForm';
 import TaskControl from './components/TaskControl';
-import { findIndex, remove, filter, includes, orderBy } from 'lodash';
 class App extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            tasks : [],
-            isShowingForm : false,
+            isDisplayForm : false,
             keyword : '',
-            sortBy : 'name',
-            sortValue : 'asc',
             filterName : '',
             filterStatus : '-1',
-            itemEditing : null
+            itemEditing : null,
+            sortBy : 'name',
+            sortValue : 1
         };
     }
 
-    componentWillMount() {
-        if(localStorage && localStorage.getItem('tasks')){
-            var tasks = JSON.parse(localStorage.getItem('tasks'));
-            this.setState({
-                tasks : tasks
-            });
-        }
-    }
-
-    s4() {
-        return  Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
-    }
-
-    guid() {
-        return this.s4() + this.s4() + '-' + this.s4() + '-' + this.s4() + '-' + this.s4() + '-' + this.s4() + this.s4() + this.s4();
+    findIndex = (id) => {
+        var {tasks} = this.state;
+        var result = -1;
+        tasks.forEach((task, index) => {
+            if(task.id === id) {
+                result = index;
+            }
+        });
+        return result;
     }
 
     onUpdateStatus = (id) => {
         var tasks = this.state.tasks;
-        var index = findIndex(tasks, { id : id });
+        var index = this.findIndex(id);
         tasks[index].status = !tasks[index].status;
         this.setState({
             tasks : tasks
@@ -54,8 +46,8 @@ class App extends Component {
             data.id = this.guid();
             tasks.push(data);
         }else{
-            var index = findIndex(tasks, { id : data.id })
-            tasks[index] = data;
+            var index = this.findIndex(data.id);
+            tasks[index]= data;
         }
         this.setState({
             tasks : tasks
@@ -84,12 +76,14 @@ class App extends Component {
     }
 
     onDeleteTask = (id) => {
-        var tasks = this.state.tasks;
-        remove(tasks, { id : id });
+        var {tasks} = this.state;
+        var index = this.findIndex(id);
+        tasks.splice(index, 1);
         this.setState({
             tasks : tasks
         });
         localStorage.setItem('tasks', JSON.stringify(tasks));
+        this.onExitForm();
     }
 
     onSearch = (keyword) => {
@@ -115,45 +109,46 @@ class App extends Component {
     onSelectedItem = (item) => {
         this.setState({
             itemEditing : item,
-            isShowingForm : true
+            isDisplayForm : true
         })
     }
 
     render() {
-        var { tasks, isShowingForm, keyword, sortBy, sortValue, filterName, filterStatus, itemEditing } = this.state;
-        tasks = filter(tasks, (task) => {
-            return includes(task.name.toLowerCase(), keyword.toLowerCase());
-        });
-        if(filterName){
-            tasks = filter(tasks, (task) => {
-                return includes(task.name.toLowerCase(), filterName.toLowerCase());
-            });
-        }
-        if(filterStatus){
-            tasks = filter(tasks, (task) => {
-                if(filterStatus === '-1' || filterStatus === -1){
-                    return task;
-                }else{
-                    return task.status === (parseInt(filterStatus, 10) === 1 ? true : false);
-                }
-            });
-        }
-        tasks = orderBy(tasks, [sortBy], [sortValue]);
-        var elmForm = isShowingForm === true ? <TaskForm
-                                                    onSave={this.onSave}
-                                                    onExitForm={this.onExitForm}
-                                                    itemEditing={ itemEditing }
-                                                    /> : '';
+        var { isDisplayForm, sortBy, sortValue, filterName, filterStatus, itemEditing } = this.state;
+        // tasks = filter(tasks, (task) => {
+        //     return includes(task.name.toLowerCase(), keyword.toLowerCase());
+        // });
+        // if(filterName){
+        //     tasks = filter(tasks, (task) => {
+        //         return includes(task.name.toLowerCase(), filterName.toLowerCase());
+        //     });
+        // }
+        // if(filterStatus){
+        //     tasks = filter(tasks, (task) => {
+        //         if(filterStatus === '-1' || filterStatus === -1){
+        //             return task;
+        //         }else{
+        //             return task.status === (parseInt(filterStatus, 10) === 1 ? true : false);
+        //         }
+        //     });
+        // }
+        // tasks = orderBy(tasks, [sortBy], [sortValue]);
+        var elmForm = isDisplayForm === true ? 
+        <TaskForm
+            onSave={this.onSave}
+            onExitForm={this.onExitForm}
+            itemEditing={ itemEditing }
+            /> : '';
         return (
             <div className="container">
                 <div className="text-center">
                     <h1>Quản Lý Công Việc</h1><hr/>
                 </div>
                 <div className="row">
-                    <div className={ isShowingForm === true ? 'col-xs-4 col-sm-4 col-md-4 col-lg-4' : '' }>
+                    <div className={ isDisplayForm === true ? 'col-xs-4 col-sm-4 col-md-4 col-lg-4' : '' }>
                         { elmForm }
                     </div>
-                    <div className={ isShowingForm === true ? 'col-xs-8 col-sm-8 col-md-8 col-lg-8' : 'col-xs-12 col-sm-12 col-md-12 col-lg-12' }>
+                    <div className={ isDisplayForm === true ? 'col-xs-8 col-sm-8 col-md-8 col-lg-8' : 'col-xs-12 col-sm-12 col-md-12 col-lg-12' }>
                         <button type="button" className="btn btn-primary" onClick={this.onToggleForm} >
                             <span className="fa fa-plus mr-5"></span>Thêm Công Việc
                         </button>
